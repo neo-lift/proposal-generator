@@ -1,49 +1,150 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with
-[`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# **AI-Assisted Hotel Proposal Generator**
 
-## Getting Started
+Integrating Vercel AI SDK + Proposales API
 
-First, run the development server:
+This project is a minimal, production-quality web app that helps **hotel sales teams** generate high-quality proposal drafts automatically using **AI** and the **Proposales API**.
+
+The sales rep enters a short event brief (or fills a small form), and the system uses an LLM to generate:
+
+* A proposal title (`title_md`)
+* A structured description (`description_md`)
+* Metadata (`data`)
+* Proposal blocks (`blocks`) mapped to the hotel’s Proposales content items
+
+The backend then creates a real draft proposal in **Proposales** via their official `POST /v3/proposals` endpoint and returns a link so the sales rep can open and edit the draft immediately.
+
+The application is built with a focus on **functional programming**, **test-driven development**, **clean modular code**, and **minimal abstractions**.
+
+---
+
+## **Features**
+
+* ✨ **AI-generated hotel proposals** from structured input or free text
+* ✨ **End-to-end integration** with the Proposales API
+* ✨ **Next.js (App Router)** full-stack application
+* ✨ **Vercel AI SDK** for prompt engineering and model calls
+* ✨ **TypeScript + Tailwind + shadcn/ui**
+* ✨ **PostgreSQL logging**
+* ✨ **Functional programming style**, small pure functions, explicit data flow
+* ✨ **Jest testing** for all domain logic and integrations
+* ✨ Hosted on **Vercel** (Hobby plan)
+
+---
+
+## **Project Architecture**
+
+1. **User submits a hotel event brief**
+   (guests, rooms, dates, meeting needs, catering, tone, etc.)
+
+2. **Backend calls the LLM** via Vercel AI SDK
+   → AI returns structured proposal data:
+
+   * `title_md`
+   * `description_md`
+   * `data`
+   * `blocks` with `content_id`s
+
+3. **Backend constructs Proposales payload**
+   and calls `POST /v3/proposals` with the hotel's `company_id`.
+
+4. **Proposales returns `{ uuid, url }`**
+   → Sales rep can immediately open the proposal.
+
+5. **Log entry stored in PostgreSQL**
+   (timestamp, customer email, proposal UUID, summary)
+
+6. **Frontend displays**
+
+   * Generated preview
+   * “Open in Proposales” button
+
+---
+
+## **Tech Stack**
+
+### Frontend
+
+* Next.js (App Router)
+* React Server Components
+* TypeScript
+* Tailwind CSS
+* shadcn/ui
+
+### Backend
+
+* Next.js Route Handlers
+* Vercel AI SDK
+* Functional-style modules
+* PostgreSQL via node-postgres (no ORM)
+* Jest + ts-jest for testing
+
+### Infrastructure
+
+* Vercel (deployment + serverless functions)
+* PostgreSQL (Supabase / Neon / RDS or local)
+
+---
+
+## **Environment Variables**
+
+Copy `.env.example` → `.env.local` and fill in:
+
+```
+PROPOSALES_API_KEY=
+PROPOSALES_COMPANY_ID=
+PROPOSALES_CONTACT_EMAIL=
+DATABASE_URL=
+```
+
+---
+
+## **Development**
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the
-result.
+Run tests:
 
-You can start editing the page by modifying `app/page.tsx`. The page
-auto-updates as you edit the file.
+```bash
+npm test
+```
 
-This project uses
-[`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)
-to automatically optimize and load [Geist](https://vercel.com/font), a new font
-family for Vercel.
+---
 
-## Learn More
+## **Project Structure**
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out
-[the Next.js GitHub repository](https://github.com/vercel/next.js) - your
-feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the
-[Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)
-from the creators of Next.js.
-
-Check out our
-[Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying)
-for more details.
+```
+src/
+  app/
+    page.tsx
+    api/
+      generate-proposal/
+        route.ts
+  lib/
+    ai/
+      generateProposalDraft.ts
+      prompt.ts
+    proposales/
+      client.ts
+      types.ts
+    domain/
+      buildPrompt.ts
+      buildProposalesPayload.ts
+      types.ts
+    db/
+      index.ts
+  components/
+    ui/
+      (shadcn/ui components)
+    forms/
+      ProposalForm.tsx
+```
