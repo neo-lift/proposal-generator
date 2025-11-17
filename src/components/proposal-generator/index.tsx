@@ -7,57 +7,51 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { sampleRFPCases } from "@/data/samples";
 import { useState } from "react";
+import { useProposalMutation } from "@/hooks/use-proposal-mutation";
 
 export default function ProposalGenerator() {
   const [inputText, setInputText] = useState<string>('');
   const [proposalType, setProposalType] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<string | null>(null);
+  const proposalMutation = useProposalMutation();
 
   const handleGenerateProposal = async () => {
-    setLoading(true);
     if (!inputText) {
       setError('Please enter an event description');
-      setLoading(false);
       return;
     }
 
     if (!proposalType) {
       setError('Please select a proposal type');
-      setLoading(false);
       return;
     }
 
-    // fetch proposal from API
-    try {
-      const response = await fetch('/api/generate-proposal', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customer: {
-            customerName: 'John Doe',
-            customerEmail: 'john.doe@example.com',
-            companyName: 'Example Inc.',
-          },
-          event: { eventType: proposalType, startDate: '2024-06-01', endDate: '2024-06-03', guestCount: 100, roomsNeeded: 10 },
-          preferences: { meetingSpaces: true, catering: true, tone: 'professional', additionalBrief: inputText },
-        }),
-      });
-      const data = await response.json();
-      setResult(data.proposal);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to generate proposal');
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-
-    console.log(inputText, proposalType);
     setError(null);
-    setResult(null);
+
+    proposalMutation.mutate({
+      customer: {
+        customerName: 'John Doe',
+        customerEmail: 'john.doe@example.com',
+        companyName: 'Example Inc.',
+      },
+      event: {
+        eventType: proposalType,
+        startDate: '2024-06-01',
+        endDate: '2024-06-03',
+        guestCount: 100,
+        roomsNeeded: 10,
+      },
+      preferences: {
+        meetingSpaces: true,
+        catering: true,
+        tone: 'professional',
+        additionalBrief: inputText,
+      },
+    }, {
+      onError: (error) => {
+        setError(error instanceof Error ? error.message : 'Failed to generate proposal');
+      },
+    });
   };
 
   return (
@@ -112,13 +106,17 @@ export default function ProposalGenerator() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full cursor-pointer font-medium" disabled={loading || !inputText || !proposalType} onClick={handleGenerateProposal}>
-            {loading ? 'Generating...' : 'Generate Proposal'}
+          <Button
+            type="submit"
+            className="w-full cursor-pointer font-medium"
+            disabled={proposalMutation.isPending || !inputText || !proposalType}
+            onClick={handleGenerateProposal}
+          >
+            {proposalMutation.isPending ? 'Thinking...' : 'Next'}
           </Button>
         </CardFooter>
       </Card>
       {error && <p className="text-red-500">{error}</p>}
-      {result && <p className="text-green-500">{result}</p>}
     </div>
   );
 }

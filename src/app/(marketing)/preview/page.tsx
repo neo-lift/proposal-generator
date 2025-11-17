@@ -11,10 +11,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { sampleProposalPayloads } from '@/data/samples';
+import GeneratedProposal from '@/components/preview/generated-proposal';
 
 const proposal = sampleProposalPayloads[0];
 
-export default function PreviewPage() {
+export default function Preview() {
   return (
     <div className="container mx-auto space-y-8 py-12 max-w-4xl">
       <header className="space-y-2">
@@ -29,6 +30,8 @@ export default function PreviewPage() {
           are pre-filled from a sample payload to guide you.
         </p>
       </header>
+
+      <GeneratedProposal />
 
       <form className="space-y-6">
         <Card>
