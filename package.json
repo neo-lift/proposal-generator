@@ -13,7 +13,10 @@
     "prepare": "husky install",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.67",
