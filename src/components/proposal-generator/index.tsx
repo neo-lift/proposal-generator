@@ -4,46 +4,74 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter }
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
-
-type ProposalFormValues = {
-  inputText: string;
-};
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 export default function ProposalGenerator() {
-  const { register, handleSubmit } = useForm<ProposalFormValues>({
-    defaultValues: { inputText: "" },
-  });
+  const [inputText, setInputText] = useState<string>('');
+  const [proposalType, setProposalType] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<string | null>(null);
 
-  const onSubmit = (data: ProposalFormValues) => {
-    console.log(data.inputText);
+  const handleGenerateProposal = async () => {
+    setLoading(true);
+    if (!inputText) {
+      setError('Please enter an event brief');
+      setLoading(false);
+      return;
+    }
+
+    if (!proposalType) {
+      setError('Please select a proposal type');
+      setLoading(false);
+      return;
+    }
+
+    console.log(inputText, proposalType);
+    setError(null);
+    setResult(null);
   };
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Card className="bg-white shadow-sm">
-          <CardHeader>
-            <CardTitle>Generate Proposal from Event Brief</CardTitle>
-            <CardDescription>
-              Enter the details of your event and click the button below to generate a proposal.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-4">
-              <Label htmlFor="event-name" className="block text-sm font-medium text-gray-700">Event Name</Label>
-              <Textarea
-                id="input-text"
-                {...register("inputText")}
-                placeholder="Paste your event description, meeting notes, email, or transcription here..."
-                rows={10}
-                className="font-mono text-sm w-full"
-              />
-            </div>
-          </CardContent>
-          <CardFooter> <Button type="submit" className="w-full cursor-pointer">Generate Proposal</Button> </CardFooter>
-        </Card>
-      </form>
+      <Card className="bg-white shadow-sm">
+        <CardHeader>
+          <CardTitle>Generate Proposal from Event Brief</CardTitle>
+          <CardDescription>
+            Paste event descriptions, meeting transcriptions, or any text describing an event.
+            Our AI will analyze it and create a professional hotel proposal.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="input-text" className="block text-sm font-medium text-gray-700">Event Type</Label>
+            <Input id="proposal-type"
+              placeholder="e.g., Corporate Event, Wedding, Conference"
+              value={proposalType}
+              onChange={(e) => setProposalType(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="input-text" className="block text-sm font-medium text-gray-700">Event Description</Label>
+            <Textarea
+              id="input-text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Paste your event description, meeting notes, email, or transcription here..."
+              rows={10}
+              className="font-mono text-sm w-full h-full"
+              style={{ height: '300px' }}
+            />
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" className="w-full cursor-pointer" disabled={loading || !inputText || !proposalType} onClick={handleGenerateProposal}>
+            {loading ? 'Generating...' : 'Generate Proposal'}
+          </Button>
+        </CardFooter>
+      </Card>
+      {error && <p className="text-red-500">{error}</p>}
+      {result && <p className="text-green-500">{result}</p>}
     </div>
   );
 }
