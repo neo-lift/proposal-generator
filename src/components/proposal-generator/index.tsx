@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { sampleEventBriefs } from "@/data/samples";
 import { useState } from "react";
 
 export default function ProposalGenerator() {
@@ -17,7 +18,7 @@ export default function ProposalGenerator() {
   const handleGenerateProposal = async () => {
     setLoading(true);
     if (!inputText) {
-      setError('Please enter an event brief');
+      setError('Please enter an event description');
       setLoading(false);
       return;
     }
@@ -60,12 +61,32 @@ export default function ProposalGenerator() {
               placeholder="Paste your event description, meeting notes, email, or transcription here..."
               rows={10}
               className="font-mono text-sm w-full h-full"
-              style={{ height: '300px' }}
+              style={{ height: '200px' }}
             />
+
+            <div className="space-y-2 mt-8">
+              <p className="text-sm text-gray-600">Try an example:</p>
+              <div className="flex flex-wrap gap-2">
+                {sampleEventBriefs.map((example, idx) => (
+                  <Button
+                    key={idx}
+                    variant="outline"
+                    size="lg"
+                    className="font-medium cursor-pointer"
+                    onClick={() => {
+                      setInputText(example.text);
+                      setProposalType(example.type);
+                    }}
+                  >
+                    {example.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full cursor-pointer" disabled={loading || !inputText || !proposalType} onClick={handleGenerateProposal}>
+          <Button type="submit" className="w-full cursor-pointer font-medium" disabled={loading || !inputText || !proposalType} onClick={handleGenerateProposal}>
             {loading ? 'Generating...' : 'Generate Proposal'}
           </Button>
         </CardFooter>
