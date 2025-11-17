@@ -89,6 +89,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       },
     });
 
+    console.log('Proposales payload built:', proposalesPayload);
+
     // Create proposal
     const proposalResult = await createProposal(proposalesPayload);
 

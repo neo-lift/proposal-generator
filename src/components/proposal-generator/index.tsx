@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { sampleEventBriefs } from "@/data/samples";
+import { sampleRFPCases } from "@/data/samples";
 import { useState } from "react";
 
 export default function ProposalGenerator() {
@@ -49,7 +49,7 @@ export default function ProposalGenerator() {
       const data = await response.json();
       setResult(data.proposal);
     } catch (error) {
-      setError('Failed to generate proposal');
+      setError(error instanceof Error ? error.message : 'Failed to generate proposal');
       setLoading(false);
     } finally {
       setLoading(false);
@@ -64,15 +64,15 @@ export default function ProposalGenerator() {
     <div className="space-y-6">
       <Card className="bg-white shadow-sm">
         <CardHeader>
-          <CardTitle>Generate Proposal from Event Brief</CardTitle>
+          <CardTitle>Generate Proposal from RFP</CardTitle>
           <CardDescription>
-            Paste event descriptions, meeting transcriptions, or any text describing an event.
+            Paste RFPs, meeting transcriptions, or any text describing an event.
             Our AI will analyze it and create a professional hotel proposal.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="input-text" className="block text-sm font-medium text-gray-700">Event Type</Label>
+            <Label htmlFor="input-text" className="block text-sm font-medium text-gray-700">RFP Type</Label>
             <Input id="proposal-type"
               placeholder="e.g., Corporate Event, Wedding, Conference"
               value={proposalType}
@@ -93,18 +93,18 @@ export default function ProposalGenerator() {
             <div className="space-y-2 mt-8">
               <p className="text-sm text-gray-600">Try an example:</p>
               <div className="flex flex-wrap gap-2">
-                {sampleEventBriefs.map((example, idx) => (
+                {sampleRFPCases.map((example, idx) => (
                   <Button
                     key={idx}
                     variant="outline"
                     size="lg"
                     className="font-medium cursor-pointer"
                     onClick={() => {
-                      setInputText(example.text);
-                      setProposalType(example.type);
+                      setInputText(example.preferences.additionalBrief);
+                      setProposalType(example.event.eventType);
                     }}
                   >
-                    {example.label}
+                    {example.event.eventType} - {example.customer.companyName}
                   </Button>
                 ))}
               </div>
