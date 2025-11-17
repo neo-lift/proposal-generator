@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-// Polyfill for TransformStream (needed for AI SDK in Jest)
+// Load environment variables from .env.local
 // This file runs before modules are imported (via setupFiles)
+require('dotenv').config({ path: '.env.local' });
+
+// Polyfill for TransformStream (needed for AI SDK in Jest)
 // TransformStream is available in Node.js 16.5+ but may need polyfill for Jest
 // Using require() here is necessary for conditional module loading
 if (typeof globalThis.TransformStream === 'undefined') {
